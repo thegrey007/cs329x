@@ -1,0 +1,3 @@
+[submodule "noveltybench"]
+	path = noveltybench
+	url = https://github.com/novelty-bench/novelty-bench.git
