@@ -1,0 +1,16 @@
+{
+  "total_buckets": 1,
+  "total_prompts": 100,
+  "total_generations": 500,
+  "total_time_seconds": 1747.4754371643066,
+  "total_time_minutes": 29.12459061940511,
+  "buckets": {
+    "(0.8, 1.0]": {
+      "alpha_mean": 0.8631360745429992,
+      "n_prompts": 100,
+      "total_generations": 500,
+      "time_seconds": 1747.4657669067383,
+      "time_per_prompt": 17.474657669067383
+    }
+  }
+}

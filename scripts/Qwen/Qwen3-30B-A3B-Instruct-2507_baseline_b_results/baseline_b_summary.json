@@ -1,0 +1,44 @@
+{
+  "total_buckets": 5,
+  "total_prompts": 500,
+  "total_generations": 2500,
+  "total_time_seconds": 1031.7990510463715,
+  "total_time_minutes": 17.19665085077286,
+  "buckets": {
+    "(-0.001, 0.2]": {
+      "alpha_mean": 0.13820453891530632,
+      "n_prompts": 100,
+      "total_generations": 500,
+      "time_seconds": 146.21434593200684,
+      "time_per_prompt": 1.4621434593200684
+    },
+    "(0.2, 0.4]": {
+      "alpha_mean": 0.3088925032317638,
+      "n_prompts": 100,
+      "total_generations": 500,
+      "time_seconds": 188.81674218177795,
+      "time_per_prompt": 1.8881674218177795
+    },
+    "(0.4, 0.6]": {
+      "alpha_mean": 0.5023655211925506,
+      "n_prompts": 100,
+      "total_generations": 500,
+      "time_seconds": 236.7177209854126,
+      "time_per_prompt": 2.367177209854126
+    },
+    "(0.6, 0.8]": {
+      "alpha_mean": 0.7012037950754165,
+      "n_prompts": 100,
+      "total_generations": 500,
+      "time_seconds": 243.62817931175232,
+      "time_per_prompt": 2.4362817931175234
+    },
+    "(0.8, 1.0]": {
+      "alpha_mean": 0.8631360745429992,
+      "n_prompts": 100,
+      "total_generations": 500,
+      "time_seconds": 216.3527009487152,
+      "time_per_prompt": 2.163527009487152
+    }
+  }
+}

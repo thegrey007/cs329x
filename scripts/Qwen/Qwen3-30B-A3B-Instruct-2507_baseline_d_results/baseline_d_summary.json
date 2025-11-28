@@ -1,0 +1,49 @@
+{
+  "total_buckets": 5,
+  "total_prompts": 500,
+  "total_successful": 442,
+  "total_time_seconds": 368.90956807136536,
+  "total_time_minutes": 6.148492801189422,
+  "buckets": {
+    "(-0.001, 0.2]": {
+      "alpha_mean": 0.13820453891530632,
+      "n_prompts": 100,
+      "successful_parses": 94,
+      "avg_answers_per_prompt": 3.872340425531915,
+      "time_seconds": 74.43629693984985,
+      "time_per_prompt": 0.7443629693984986
+    },
+    "(0.2, 0.4]": {
+      "alpha_mean": 0.3088925032317638,
+      "n_prompts": 100,
+      "successful_parses": 91,
+      "avg_answers_per_prompt": 3.78021978021978,
+      "time_seconds": 79.81193590164185,
+      "time_per_prompt": 0.7981193590164185
+    },
+    "(0.4, 0.6]": {
+      "alpha_mean": 0.5023655211925506,
+      "n_prompts": 100,
+      "successful_parses": 89,
+      "avg_answers_per_prompt": 3.966292134831461,
+      "time_seconds": 71.65139818191528,
+      "time_per_prompt": 0.7165139818191528
+    },
+    "(0.6, 0.8]": {
+      "alpha_mean": 0.7012037950754165,
+      "n_prompts": 100,
+      "successful_parses": 85,
+      "avg_answers_per_prompt": 4.294117647058823,
+      "time_seconds": 73.51270198822021,
+      "time_per_prompt": 0.7351270198822022
+    },
+    "(0.8, 1.0]": {
+      "alpha_mean": 0.8631360745429992,
+      "n_prompts": 100,
+      "successful_parses": 83,
+      "avg_answers_per_prompt": 4.216867469879518,
+      "time_seconds": 69.47467279434204,
+      "time_per_prompt": 0.6947467279434204
+    }
+  }
+}
