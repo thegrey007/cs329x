@@ -163,6 +163,7 @@ Rank these {len(valid_answers)} responses by diversity (most to least diverse)."
 
 dataset3_pairs = []
 failed_judgments = 0
+failed_judgment_details = []  # Store full details of failed judgments
 
 print(f"🤖 Judging diversity for {len(filtered_rows)} prompts...")
 print(f"💰 Estimated cost: ~${len(filtered_rows) * 1800 * 0.60 / 1_000_000:.2f}")
@@ -190,6 +191,22 @@ for row_idx, row_data in enumerate(tqdm(filtered_rows, desc="LLM Judging")):
     # Check if judgment failed (fallback scores)
     if llm_diversity_scores == list(range(len(valid_answers))):
         failed_judgments += 1
+        # Store detailed information for manual review/retry
+        failed_judgment_details.append({
+            'row_idx': row_idx,
+            'instruction': row['instruction'],
+            'valid_answers': valid_answers,
+            'valid_indices': valid_idxs,
+            'overall_scores': [scores[i] for i in valid_idxs],
+            'factual_score': row['factual_score'],
+            'creative_score': row['creative_score'],
+            'alpha_bin': row['alpha_bin'],
+            'is_creative': is_creative_prompt(row),
+            'fallback_scores_used': llm_diversity_scores,
+            'full_row_data': row_data  # Complete original data for retry
+        })
+        # Skip this prompt - don't create pair with incorrect fallback logic
+        continue
     
     # Determine prompt type
     is_creative = is_creative_prompt(row)
@@ -264,6 +281,18 @@ dataset3_df.to_parquet(output_path, index=False)
 
 print(f"\n✅ Saved to: {output_path}")
 print(f"Columns: {list(dataset3_df.columns)}")
+
+# Save failed judgments for manual review/retry
+if failed_judgment_details:
+    failed_path = "failed_judgments.pkl"
+    with open(failed_path, 'wb') as f:
+        pickle.dump(failed_judgment_details, f)
+    print(f"\n⚠️  Saved {len(failed_judgment_details)} failed judgments to: {failed_path}")
+    print(f"   Each entry contains: instruction, responses, scores, and full row data")
+    print(f"   Load with: pickle.load(open('{failed_path}', 'rb'))")
+else:
+    print(f"\n✅ No failed judgments - all LLM judgments successful!")
+
 print("\n" + "=" * 80)
 print("ALL DONE! 🎉")
 print("=" * 80)

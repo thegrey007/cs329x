@@ -23,12 +23,16 @@ from typing import cast
 
 import chz
 import datasets
+from dotenv import load_dotenv
 from tinker_cookbook import cli_utils, model_info
 from tinker_cookbook.preference import train_dpo
 from tinker_cookbook.preference.dpo_datasets import DPODatasetBuilderFromComparisons
 from tinker_cookbook.preference.preference_datasets import ComparisonDatasetBuilder
 from tinker_cookbook.preference.types import Comparison, LabeledComparison
 from tinker_cookbook.supervised.types import ChatDatasetBuilderCommonConfig
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 # ============================================================================
@@ -72,8 +76,9 @@ class CustomParquetComparisonBuilder(ComparisonDatasetBuilder):
 
         # Shuffle and split
         dataset = dataset.shuffle(seed=0)
-        test_dataset = dataset.take(min(self.test_size, len(dataset) // 10))
-        train_dataset = dataset.skip(min(self.test_size, len(dataset) // 10))
+        test_size = min(self.test_size, len(dataset) // 10)
+        test_dataset = dataset.select(range(test_size))
+        train_dataset = dataset.select(range(test_size, len(dataset)))
 
         print(f"\n{'='*70}")
         print(f"Loaded Dataset {self.dataset_number}")
@@ -87,7 +92,7 @@ class CustomParquetComparisonBuilder(ComparisonDatasetBuilder):
     def example_to_labeled_comparison(self, example: dict) -> LabeledComparison | None:
         """Convert parquet example to LabeledComparison format."""
         try:
-            prompt = example["prompt"]
+            prompt = example["input"]
             chosen = example["chosen"]
             rejected = example["rejected"]
 
@@ -116,49 +121,31 @@ class CLIConfig:
     """Command-line configuration for DPO training."""
 
     # ========== ESSENTIAL PARAMETERS (Must specify) ==========
-    model_name: str = chz.field(
-        default="Qwen/Qwen3-4B-Instruct-2507",
-        help="Base model to fine-tune (e.g., Qwen/Qwen3-4B-Instruct-2507, Qwen/Qwen3-8B)",
-    )
-    dataset: int = chz.field(
-        default=1,
-        help="Dataset number: 1 (embedding diversity), 2 (quality), 3 (LLM judge)",
-    )
+    model_name: str = "Qwen/Qwen3-4B-Instruct-2507"
+    dataset: int = 1
 
     # ========== IMPORTANT HYPERPARAMETERS (Good defaults provided) ==========
-    learning_rate: float = chz.field(default=1e-5, help="Learning rate for training")
-    dpo_beta: float = chz.field(default=0.1, help="DPO beta parameter (preference strength)")
-    batch_size: int = chz.field(default=256, help="Batch size for training")
-    num_epochs: int = chz.field(default=1, help="Number of training epochs")
-    lora_rank: int = chz.field(default=32, help="LoRA rank (adapter capacity)")
-    max_length: int | None = chz.field(default=8192, help="Maximum sequence length")
+    learning_rate: float = 1e-5
+    dpo_beta: float = 0.1
+    batch_size: int = 256
+    num_epochs: int = 1
+    lora_rank: int = 32
+    max_length: int | None = 8192
 
     # ========== OPTIONAL PARAMETERS ==========
-    lr_schedule: str = chz.field(
-        default="linear", help="Learning rate schedule: linear, cosine, or constant"
-    )
-    renderer_name: str | None = chz.field(
-        default=None, help="Chat renderer name (auto-detected if not specified)"
-    )
-    load_checkpoint_path: str | None = chz.field(
-        default=None, help="Path to checkpoint to resume from"
-    )
+    lr_schedule: str = "linear"
+    renderer_name: str | None = None
+    load_checkpoint_path: str | None = None
 
     # ========== LOGGING & TRACKING (Optional, auto-generated if not specified) ==========
-    log_path: str | None = chz.field(
-        default=None, help="Local directory for logs/checkpoints (auto-generated if None)"
-    )
-    wandb_project: str | None = chz.field(
-        default=None, help="WandB project name (e.g., cs329x-dpo). Disabled if None."
-    )
-    wandb_name: str | None = chz.field(
-        default=None, help="WandB run name (auto-generated if None)"
-    )
+    log_path: str | None = None
+    wandb_project: str | None = None
+    wandb_name: str | None = None
 
     # ========== INFRASTRUCTURE ==========
-    base_url: str | None = chz.field(default=None, help="Tinker API base URL")
-    save_every: int = chz.field(default=20, help="Save checkpoint every N steps")
-    eval_every: int = chz.field(default=10, help="Evaluate every N steps")
+    base_url: str | None = None
+    save_every: int = 20
+    eval_every: int = 10
 
     behavior_if_log_dir_exists: cli_utils.LogdirBehavior = "ask"
 
