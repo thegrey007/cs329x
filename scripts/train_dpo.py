@@ -162,23 +162,18 @@ def cli_main(cli_config: CLIConfig):
         cli_config.model_name
     )
 
-    # Generate descriptive run name components
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    model_short = cli_config.model_name.split("/")[-1].replace("Instruct-", "").replace("-", "")
-    lr_str = f"lr{cli_config.learning_rate:.0e}".replace("e-0", "e-")
-    beta_str = f"beta{cli_config.dpo_beta}"
+    # Generate timestamp for unique run identification
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
     # Auto-generate log_path if not specified
     if cli_config.log_path is not None:
         log_path = cli_config.log_path
     else:
-        log_path = (
-            f"experiments/dataset{cli_config.dataset}_{model_short}_{lr_str}_{beta_str}_{date_str}"
-        )
+        log_path = f"experiments/dataset{cli_config.dataset}_{timestamp}"
 
     # Auto-generate wandb_name if wandb_project is specified but wandb_name is not
     if cli_config.wandb_project is not None and cli_config.wandb_name is None:
-        wandb_name = f"dataset{cli_config.dataset}_{model_short}_{lr_str}_{beta_str}_{date_str}"
+        wandb_name = f"dataset{cli_config.dataset}_{timestamp}"
     else:
         wandb_name = cli_config.wandb_name
 

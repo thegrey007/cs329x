@@ -145,6 +145,8 @@ env.bak/
 venv.bak/
 data/final_lamini_informational_creative_dataset_uf
 scripts/filtered_rows.pkl
+scripts/failed_judgments.pkl
+scripts/dataset3_llm_judge_diversity.parquet
 
 # Spyder project settings
 .spyderproject
