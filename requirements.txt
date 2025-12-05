@@ -4,6 +4,7 @@
 
 # Training & ML
 tinker>=0.1.0
+chz>=0.1.0
 torch>=2.0.0
 transformers>=4.30.0
 datasets>=2.14.0
