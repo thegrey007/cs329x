@@ -50,39 +50,25 @@ inference_results/
 
 ## Training Commands
 
+**Note:** Training scripts use `key=value` syntax (no dashes).
+
 ### Standard DPO
 ```bash
-python3 scripts/train_dpo.py \
-  --dataset 1 \
-  --learning_rate 1e-5 \
-  --num_epochs 1 \
-  --batch_size 256 \
-  --dpo_beta 0.1
+python3 scripts/train_dpo.py model_name=Qwen/Qwen3-8B dataset=1 learning_rate=1e-5 num_epochs=1 batch_size=256 dpo_beta=0.1
 ```
 
 **Output:** `experiments/dataset1_{timestamp}/`
 
 ### 2-Adapter DPO
 ```bash
-python3 scripts/train_2adapter_dpo.py \
-  --dataset 1 \
-  --learning_rate 1e-5 \
-  --num_epochs 1 \
-  --batch_size 256 \
-  --dpo_beta 0.1
+python3 scripts/train_2adapter_dpo.py model_name=Qwen/Qwen3-8B dataset=1 learning_rate=1e-5 num_epochs=1 batch_size=256 dpo_beta=0.1
 ```
 
 **Output:** `experiments/2adapter_dataset1_{timestamp}/factual/` and `.../creative/`
 
 ### Diversity-Weighted DPO
 ```bash
-python3 scripts/train_diversity_weighted_dpo.py \
-  --dataset 1 \
-  --gamma 0.05 \
-  --learning_rate 1e-5 \
-  --num_epochs 1 \
-  --batch_size 256 \
-  --dpo_beta 0.1
+python3 scripts/train_diversity_weighted_dpo.py model_name=Qwen/Qwen3-8B dataset=1 gamma=0.05 learning_rate=1e-5 num_epochs=1 batch_size=256 dpo_beta=0.1
 ```
 
 **Output:** `experiments/diversity_weighted_dataset1_gamma0.05_{timestamp}/`
@@ -201,7 +187,7 @@ Each JSON file contains:
 
 ```bash
 # 1. Train standard DPO on dataset 1
-python3 scripts/train_dpo.py --dataset 1
+python3 scripts/train_dpo.py model_name=Qwen/Qwen3-8B dataset=1
 
 # Output: experiments/dataset1_2024-12-05_14-23-47/
 

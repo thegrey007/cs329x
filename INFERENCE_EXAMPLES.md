@@ -2,6 +2,8 @@
 
 This file contains example commands for running inference with trained DPO models.
 
+**Note:** Inference scripts use standard `--key value` syntax (unlike training scripts which use `key=value`).
+
 ---
 
 ## 📋 Prerequisites

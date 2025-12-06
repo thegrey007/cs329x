@@ -28,12 +28,11 @@ Make sure you have generated your DPO datasets:
 
 ### 3. Run Your First Training
 
+**Note:** Training scripts use `key=value` syntax (no `--` dashes).
+
 ```bash
-# Train Qwen 4B on Dataset 1
-python scripts/train_dpo.py \
-    model_name=Qwen/Qwen3-4B-Instruct-2507 \
-    dataset=1 \
-    wandb_project=cs329x-dpo
+# Train Qwen 8B on Dataset 1
+python3 scripts/train_dpo.py model_name=Qwen/Qwen3-8B dataset=1 wandb_project=cs329x-dpo
 ```
 
 ## File Structure
@@ -80,11 +79,8 @@ experiments/                   # Auto-generated during training
 ### Workflow 1: Single Experiment
 
 ```bash
-# Train on Dataset 1 with Qwen 4B
-python scripts/train_dpo.py \
-    model_name=Qwen/Qwen3-4B-Instruct-2507 \
-    dataset=1 \
-    wandb_project=cs329x-dpo
+# Train on Dataset 1 with Qwen 8B
+python3 scripts/train_dpo.py model_name=Qwen/Qwen3-8B dataset=1 wandb_project=cs329x-dpo
 ```
 
 **Output:**
@@ -96,9 +92,9 @@ python scripts/train_dpo.py \
 
 ```bash
 # Try different DPO betas
-python scripts/train_dpo.py model_name=Qwen/Qwen3-4B-Instruct-2507 dataset=1 dpo_beta=0.1 wandb_project=cs329x-dpo
-python scripts/train_dpo.py model_name=Qwen/Qwen3-4B-Instruct-2507 dataset=1 dpo_beta=0.2 wandb_project=cs329x-dpo
-python scripts/train_dpo.py model_name=Qwen/Qwen3-4B-Instruct-2507 dataset=1 dpo_beta=0.05 wandb_project=cs329x-dpo
+python3 scripts/train_dpo.py model_name=Qwen/Qwen3-8B dataset=1 dpo_beta=0.1 wandb_project=cs329x-dpo
+python3 scripts/train_dpo.py model_name=Qwen/Qwen3-8B dataset=1 dpo_beta=0.2 wandb_project=cs329x-dpo
+python3 scripts/train_dpo.py model_name=Qwen/Qwen3-8B dataset=1 dpo_beta=0.05 wandb_project=cs329x-dpo
 ```
 
 ### Workflow 3: Full Experiment Suite (3 Datasets × 3 Models)
@@ -107,10 +103,7 @@ python scripts/train_dpo.py model_name=Qwen/Qwen3-4B-Instruct-2507 dataset=1 dpo
 # Run all combinations
 for dataset in 1 2 3; do
     for model in "Qwen/Qwen3-4B-Instruct-2507" "Qwen/Qwen3-8B" "Qwen/Qwen3-30B-A3B-Instruct-2507"; do
-        python scripts/train_dpo.py \
-            model_name=$model \
-            dataset=$dataset \
-            wandb_project=cs329x-dpo
+        python3 scripts/train_dpo.py model_name=$model dataset=$dataset wandb_project=cs329x-dpo
     done
 done
 ```
