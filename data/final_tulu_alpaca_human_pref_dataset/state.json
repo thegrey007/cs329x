@@ -1,0 +1,20 @@
+{
+  "_data_files": [
+    {
+      "filename": "data-00000-of-00001.arrow"
+    }
+  ],
+  "_fingerprint": "c12ebc5de7b86190",
+  "_format_columns": [
+    "chosen",
+    "rejected",
+    "instruction",
+    "label",
+    "factual_score",
+    "creative_score"
+  ],
+  "_format_kwargs": {},
+  "_format_type": null,
+  "_output_all_columns": false,
+  "_split": null
+}

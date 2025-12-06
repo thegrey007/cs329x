@@ -138,6 +138,44 @@ python3 scripts/inference_diversity_weighted_dpo.py \
 
 ---
 
+## Test Datasets
+
+Two test datasets are available for evaluation:
+
+### In-Domain Evaluation (UltraFeedback)
+
+**File:** `scripts/test_ultrafeedback.parquet`
+- **Size:** 2,000 prompts
+- **Source:** UltraFeedback (same distribution as training data)
+- **Use case:** Evaluate generalization on held-out UltraFeedback data
+
+```bash
+python3 scripts/inference_standard_dpo.py \
+  --model_path tinker://your-model-id \
+  --test_dataset scripts/test_ultrafeedback.parquet
+```
+
+### Out-of-Domain Evaluation (Tulu/Alpaca)
+
+**File:** `scripts/test_tulu_alpaca.parquet`
+- **Size:** 9,686 prompts
+- **Source:** Tulu + Alpaca datasets (different distribution)
+- **Use case:** Evaluate robustness on out-of-domain data
+
+```bash
+python3 scripts/inference_standard_dpo.py \
+  --model_path tinker://your-model-id \
+  --test_dataset scripts/test_tulu_alpaca.parquet
+```
+
+**Both datasets have compatible schemas:**
+- `instruction`: The prompt/instruction
+- `label`: Prompt type (factual/creative)
+- `creative_score`: Creativity score (0-1)
+- `factual_score`: Factuality score (0-1)
+
+---
+
 ## Inference Output Format
 
 Each JSON file contains:
