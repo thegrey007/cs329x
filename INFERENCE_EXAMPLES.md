@@ -2,7 +2,7 @@
 
 This file contains example commands for running inference with trained DPO models.
 
-**Note:** Inference scripts use standard `--key value` syntax (unlike training scripts which use `key=value`).
+**Note:** Inference scripts use `key=value` syntax (no dashes), same as training scripts.
 
 ---
 
@@ -20,10 +20,10 @@ This file contains example commands for running inference with trained DPO model
 
 ```bash
 python3 scripts/inference_standard_dpo.py \
-  --model_path tinker://experiments/dataset1_2024-12-05_14-23-47 \
-  --test_dataset scripts/test_ultrafeedback.parquet \
-  --k_samples 5 \
-  --max_concurrent 10
+  model_path=tinker://experiments/dataset1_2024-12-05_14-23-47/sampler_weights/final \
+  test_dataset=scripts/test_ultrafeedback.parquet \
+  k_samples=5 \
+  max_concurrent=10
 ```
 
 **Output:** `inference_results/standard_dpo/dataset1_2024-12-05_14-23-47.json`
@@ -34,11 +34,11 @@ python3 scripts/inference_standard_dpo.py \
 
 ```bash
 python3 scripts/inference_2adapter_dpo.py \
-  --factual_adapter_path tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/factual \
-  --creative_adapter_path tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/creative \
-  --test_dataset scripts/test_ultrafeedback.parquet \
-  --k_samples 5 \
-  --max_concurrent 10
+  factual_adapter_path=tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/factual/sampler_weights/final \
+  creative_adapter_path=tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/creative/sampler_weights/final \
+  test_dataset=scripts/test_ultrafeedback.parquet \
+  k_samples=5 \
+  max_concurrent=10
 ```
 
 **Output:** `inference_results/2adapter_dpo/2adapter_dataset1_2024-12-05_14-30-00.json`
@@ -49,10 +49,10 @@ python3 scripts/inference_2adapter_dpo.py \
 
 ```bash
 python3 scripts/inference_diversity_weighted_dpo.py \
-  --model_path tinker://experiments/diversity_weighted_dataset1_gamma0.05_2024-12-05_14-45-00 \
-  --test_dataset scripts/test_ultrafeedback.parquet \
-  --k_samples 5 \
-  --max_concurrent 10
+  model_path=tinker://experiments/diversity_weighted_dataset1_gamma0.05_2024-12-05_14-45-00/sampler_weights/final \
+  test_dataset=scripts/test_ultrafeedback.parquet \
+  k_samples=5 \
+  max_concurrent=10
 ```
 
 **Output:** `inference_results/diversity_weighted_dpo/diversity_weighted_dataset1_gamma0.05_2024-12-05_14-45-00.json`
@@ -126,20 +126,20 @@ You can run inference on multiple trained models sequentially:
 # Standard DPO on all datasets
 for dataset in dataset1 dataset2; do
   python3 scripts/inference_standard_dpo.py \
-    --model_path tinker://experiments/${dataset}_2024-12-05_14-23-47 \
-    --test_dataset scripts/test_ultrafeedback.parquet
+    model_path=tinker://experiments/${dataset}_2024-12-05_14-23-47/sampler_weights/final \
+    test_dataset=scripts/test_ultrafeedback.parquet
 done
 
 # 2-Adapter DPO
 python3 scripts/inference_2adapter_dpo.py \
-  --factual_adapter_path tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/factual \
-  --creative_adapter_path tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/creative \
-  --test_dataset scripts/test_ultrafeedback.parquet
+  factual_adapter_path=tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/factual/sampler_weights/final \
+  creative_adapter_path=tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/creative/sampler_weights/final \
+  test_dataset=scripts/test_ultrafeedback.parquet
 
 # Diversity-Weighted DPO
 python3 scripts/inference_diversity_weighted_dpo.py \
-  --model_path tinker://experiments/diversity_weighted_dataset1_gamma0.05_2024-12-05_14-45-00 \
-  --test_dataset scripts/test_ultrafeedback.parquet
+  model_path=tinker://experiments/diversity_weighted_dataset1_gamma0.05_2024-12-05_14-45-00/sampler_weights/final \
+  test_dataset=scripts/test_ultrafeedback.parquet
 ```
 
 ---

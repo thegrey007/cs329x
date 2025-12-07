@@ -91,12 +91,14 @@ python3 scripts/train_diversity_weighted_dpo.py model_name=Qwen/Qwen3-8B dataset
 
 ## Inference Commands
 
+**Note:** Inference scripts use `key=value` syntax (no dashes), like training scripts.
+
 ### Standard DPO
 ```bash
 python3 scripts/inference_standard_dpo.py \
-  --model_path tinker://experiments/dataset1_2024-12-05_14-23-47 \
-  --test_dataset scripts/test_ultrafeedback.parquet \
-  --k_samples 5
+  model_path=tinker://experiments/dataset1_2024-12-05_14-23-47/sampler_weights/final \
+  test_dataset=scripts/test_ultrafeedback.parquet \
+  k_samples=5
 ```
 
 **Output:** `inference_results/standard_dpo/dataset1_2024-12-05_14-23-47.json`
@@ -104,10 +106,10 @@ python3 scripts/inference_standard_dpo.py \
 ### 2-Adapter DPO
 ```bash
 python3 scripts/inference_2adapter_dpo.py \
-  --factual_adapter_path tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/factual \
-  --creative_adapter_path tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/creative \
-  --test_dataset scripts/test_ultrafeedback.parquet \
-  --k_samples 5
+  factual_adapter_path=tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/factual/sampler_weights/final \
+  creative_adapter_path=tinker://experiments/2adapter_dataset1_2024-12-05_14-30-00/creative/sampler_weights/final \
+  test_dataset=scripts/test_ultrafeedback.parquet \
+  k_samples=5
 ```
 
 **Output:** `inference_results/2adapter_dpo/2adapter_dataset1_2024-12-05_14-30-00.json`
@@ -115,9 +117,9 @@ python3 scripts/inference_2adapter_dpo.py \
 ### Diversity-Weighted DPO
 ```bash
 python3 scripts/inference_diversity_weighted_dpo.py \
-  --model_path tinker://experiments/diversity_weighted_dataset1_gamma0.05_2024-12-05_14-45-00 \
-  --test_dataset scripts/test_ultrafeedback.parquet \
-  --k_samples 5
+  model_path=tinker://experiments/diversity_weighted_dataset1_gamma0.05_2024-12-05_14-45-00/sampler_weights/final \
+  test_dataset=scripts/test_ultrafeedback.parquet \
+  k_samples=5
 ```
 
 **Output:** `inference_results/diversity_weighted_dpo/diversity_weighted_dataset1_gamma0.05_2024-12-05_14-45-00.json`
@@ -128,13 +130,13 @@ python3 scripts/inference_diversity_weighted_dpo.py \
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `--model_path` | (required) | Trained model path (tinker:/) |
-| `--factual_adapter_path` | (required) | Factual adapter path (2-adapter only) |
-| `--creative_adapter_path` | (required) | Creative adapter path (2-adapter only) |
-| `--test_dataset` | `scripts/test_ultrafeedback.parquet` | Test dataset path |
-| `--k_samples` | `5` | Number of responses per prompt |
-| `--max_concurrent` | `10` | Max concurrent prompts |
-| `--temperature` | `1.0` | Sampling temperature |
+| `model_path` | (required) | Trained model path (use `/sampler_weights/final`) |
+| `factual_adapter_path` | (required) | Factual adapter path (2-adapter only) |
+| `creative_adapter_path` | (required) | Creative adapter path (2-adapter only) |
+| `test_dataset` | `scripts/test_ultrafeedback.parquet` | Test dataset path |
+| `k_samples` | `5` | Number of responses per prompt |
+| `max_concurrent` | `10` | Max concurrent prompts |
+| `temperature` | `1.0` | Sampling temperature |
 
 ---
 
@@ -151,8 +153,8 @@ Two test datasets are available for evaluation:
 
 ```bash
 python3 scripts/inference_standard_dpo.py \
-  --model_path tinker://your-model-id \
-  --test_dataset scripts/test_ultrafeedback.parquet
+  model_path=tinker://your-model-id/sampler_weights/final \
+  test_dataset=scripts/test_ultrafeedback.parquet
 ```
 
 ### Out-of-Domain Evaluation (Tulu/Alpaca)
@@ -164,8 +166,8 @@ python3 scripts/inference_standard_dpo.py \
 
 ```bash
 python3 scripts/inference_standard_dpo.py \
-  --model_path tinker://your-model-id \
-  --test_dataset scripts/test_tulu_alpaca.parquet
+  model_path=tinker://your-model-id/sampler_weights/final \
+  test_dataset=scripts/test_tulu_alpaca.parquet
 ```
 
 **Both datasets have compatible schemas:**
@@ -231,8 +233,8 @@ python3 scripts/train_dpo.py model_name=Qwen/Qwen3-8B dataset=1
 
 # 2. Run inference on trained model
 python3 scripts/inference_standard_dpo.py \
-  --model_path tinker://experiments/dataset1_2024-12-05_14-23-47 \
-  --test_dataset scripts/test_ultrafeedback.parquet
+  model_path=tinker://experiments/dataset1_2024-12-05_14-23-47/sampler_weights/final \
+  test_dataset=scripts/test_ultrafeedback.parquet
 
 # Output: inference_results/standard_dpo/dataset1_2024-12-05_14-23-47.json
 ```
