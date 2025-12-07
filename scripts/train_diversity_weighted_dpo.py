@@ -145,55 +145,10 @@ class DiversityWeightedParquetComparisonBuilder(ComparisonDatasetBuilder):
 
 
 # ============================================================================
-# SECTION 3: CUSTOM DATASET WRAPPER (Inject Metadata into Datums)
+# SECTION 3: USE STANDARD DPO DATASET BUILDER
 # ============================================================================
-
-@chz.chz
-class DiversityWeightedDPODatasetBuilder(DPODatasetBuilderFromComparisons):
-    """Extends DPO dataset builder to inject diversity metadata into Datum objects."""
-
-    def build_datums(
-        self, train_data: list[LabeledComparison], test_data: list[LabeledComparison]
-    ) -> tuple[list[tinker.Datum], list[tinker.Datum]]:
-        """Build datums with diversity metadata attached."""
-        # Get base datums from parent class
-        train_datums, test_datums = super().build_datums(train_data, test_data)
-
-        # Inject metadata into datums
-        train_datums_with_metadata = []
-        for i, datum in enumerate(train_datums):
-            # Get corresponding labeled comparison (alternates chosen/rejected)
-            comparison_idx = i // 2
-            if comparison_idx < len(train_data):
-                labeled_comp = train_data[comparison_idx]
-                if hasattr(labeled_comp, "_diversity_metadata"):
-                    metadata = labeled_comp._diversity_metadata  # type: ignore
-                    # Add metadata to loss_fn_inputs
-                    datum.loss_fn_inputs["d_pair"] = tinker.TensorData.from_torch(
-                        torch.tensor([metadata["d_pair"]], dtype=torch.float32)
-                    )
-                    datum.loss_fn_inputs["alpha"] = tinker.TensorData.from_torch(
-                        torch.tensor([metadata["alpha"]], dtype=torch.float32)
-                    )
-            train_datums_with_metadata.append(datum)
-
-        # Same for test datums
-        test_datums_with_metadata = []
-        for i, datum in enumerate(test_datums):
-            comparison_idx = i // 2
-            if comparison_idx < len(test_data):
-                labeled_comp = test_data[comparison_idx]
-                if hasattr(labeled_comp, "_diversity_metadata"):
-                    metadata = labeled_comp._diversity_metadata  # type: ignore
-                    datum.loss_fn_inputs["d_pair"] = tinker.TensorData.from_torch(
-                        torch.tensor([metadata["d_pair"]], dtype=torch.float32)
-                    )
-                    datum.loss_fn_inputs["alpha"] = tinker.TensorData.from_torch(
-                        torch.tensor([metadata["alpha"]], dtype=torch.float32)
-                    )
-            test_datums_with_metadata.append(datum)
-
-        return train_datums_with_metadata, test_datums_with_metadata
+# We use the standard DPODatasetBuilderFromComparisons
+# Metadata is loaded separately in the training loop
 
 
 # ============================================================================
@@ -326,6 +281,7 @@ def do_update(
     dataset: Any,
     ml_logger: ml_log.Logger,
     gamma: float,
+    metadata_list: list[dict[str, float]],
 ):
     """Custom training update with diversity-weighted DPO loss."""
     start_time = time.time()
@@ -334,11 +290,16 @@ def do_update(
 
     # Get batch
     with timed("data", metrics):
-        data = dataset.get_batch()
+        data = dataset.get_batch(batch_idx)
 
     # Split into chosen and rejected
     chosen_data = [data[i] for i in range(0, len(data), 2)]
     rejected_data = [data[i] for i in range(1, len(data), 2)]
+    
+    # Get metadata for this batch (each example in the batch becomes 2 datums)
+    batch_size = len(chosen_data)
+    batch_start = batch_idx * batch_size
+    batch_metadata = metadata_list[batch_start:batch_start + batch_size]
 
     # Learning rate schedule
     if config.lr_schedule == "linear":
@@ -407,9 +368,10 @@ def do_update(
             rejected_logprobs.append(rejected_logprob)
             rejected_ref_logprobs.append(rejected_ref_logprob)
 
-            # Extract diversity metadata (same for chosen and rejected)
-            d_pair = chosen_data[i].loss_fn_inputs["d_pair"].to_torch()
-            alpha = chosen_data[i].loss_fn_inputs["alpha"].to_torch()
+            # Extract diversity metadata from batch_metadata
+            metadata = batch_metadata[i]
+            d_pair = torch.tensor([metadata["d_pair"]], dtype=torch.float32)
+            alpha = torch.tensor([metadata["alpha"]], dtype=torch.float32)
             d_pairs.append(d_pair)
             alphas.append(alpha)
 
@@ -453,9 +415,10 @@ def do_update(
 
 def custom_training_main(config: Any, gamma: float):
     """Custom training loop with diversity-weighted DPO loss."""
-    from tinker_cookbook.utils import checkpoint_utils, logging_utils
-    from tinker_cookbook.utils.misc_utils import get_tokenizer
+    from tinker_cookbook import checkpoint_utils
+    from tinker_cookbook.tokenizer_utils import get_tokenizer
     import logging
+    import pandas as pd
 
     logger = logging.getLogger(__name__)
 
@@ -483,6 +446,20 @@ def custom_training_main(config: Any, gamma: float):
     dataset, maybe_test_dataset = config.dataset_builder()
     n_batches = len(dataset)
     total_steps = n_batches * config.num_epochs
+    
+    # Load and prepare metadata - get the shuffled HF dataset used to build the datums
+    train_hf_dataset, _ = config.dataset_builder.comparison_builder.get_train_and_test_datasets()
+    
+    # Extract metadata in the same order as the shuffled dataset
+    metadata_list = []
+    for idx in range(len(train_hf_dataset)):
+        example = train_hf_dataset[idx]
+        metadata_list.append({
+            "d_pair": float(example["d_pair"]),
+            "alpha": float(example["creative_score"]),
+        })
+    
+    logger.info(f"Loaded metadata for {len(metadata_list)} examples")
 
     logger.info(
         f"Training for {n_batches} batches x {config.num_epochs} epochs = {n_batches * config.num_epochs} steps"
@@ -507,6 +484,7 @@ def custom_training_main(config: Any, gamma: float):
                 dataset=dataset,
                 ml_logger=ml_logger,
                 gamma=gamma,
+                metadata_list=metadata_list,
             )
 
             # Save checkpoints periodically
@@ -566,8 +544,8 @@ def cli_main(cli_config: CLIConfig):
     # Check if log directory exists
     cli_utils.check_log_dir(log_path, behavior_if_exists=cli_config.behavior_if_log_dir_exists)
 
-    # Create dataset builder (using custom wrapper)
-    dataset_builder = DiversityWeightedDPODatasetBuilder(
+    # Create dataset builder (using standard DPO builder)
+    dataset_builder = DPODatasetBuilderFromComparisons(
         common_config=ChatDatasetBuilderCommonConfig(
             model_name_for_tokenizer=cli_config.model_name,
             renderer_name=renderer_name,
