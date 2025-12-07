@@ -43,6 +43,37 @@ except LookupError:
 load_dotenv()
 
 # ============================================================
+# HELPER FUNCTIONS
+# ============================================================
+
+def sanitize_for_json(obj):
+    """Recursively sanitize objects for JSON serialization"""
+    import math
+    
+    if isinstance(obj, dict):
+        return {k: sanitize_for_json(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [sanitize_for_json(item) for item in obj]
+    elif isinstance(obj, (np.integer, np.int64, np.int32)):
+        return int(obj)
+    elif isinstance(obj, (np.floating, np.float64, np.float32)):
+        val = float(obj)
+        # Replace NaN and Inf with 0.0
+        if not math.isfinite(val):
+            return 0.0
+        return val
+    elif isinstance(obj, np.ndarray):
+        return sanitize_for_json(obj.tolist())
+    elif isinstance(obj, (float, int)):
+        if isinstance(obj, float) and not math.isfinite(obj):
+            return 0.0
+        return obj
+    elif obj is None or isinstance(obj, (str, bool)):
+        return obj
+    else:
+        return str(obj)
+
+# ============================================================
 # CLI CONFIGURATION
 # ============================================================
 
@@ -66,39 +97,69 @@ def calculate_self_bleu(responses):
     if len(responses) < 2:
         return 0.0
     
+    # Filter out empty or invalid responses
+    valid_responses = [r for r in responses if r and isinstance(r, str) and r.strip()]
+    if len(valid_responses) < 2:
+        return 0.0
+    
     smoothing = SmoothingFunction().method1
     bleu_scores = []
     
-    for i, response in enumerate(responses):
-        hypothesis = word_tokenize(response.lower())
-        references = [
-            word_tokenize(responses[j].lower()) 
-            for j in range(len(responses)) 
-            if j != i
-        ]
-        
+    for i, response in enumerate(valid_responses):
         try:
+            hypothesis = word_tokenize(response.lower())
+            if not hypothesis:  # Skip empty tokenizations
+                continue
+                
+            references = [
+                word_tokenize(valid_responses[j].lower()) 
+                for j in range(len(valid_responses)) 
+                if j != i
+            ]
+            
+            # Filter out empty references
+            references = [ref for ref in references if ref]
+            if not references:
+                continue
+            
             bleu = sentence_bleu(
                 references, 
                 hypothesis, 
                 smoothing_function=smoothing,
                 weights=(0.25, 0.25, 0.25, 0.25)
             )
-            bleu_scores.append(bleu)
+            
+            # Check for NaN or Inf
+            if np.isfinite(bleu):
+                bleu_scores.append(bleu)
         except:
             continue
     
-    return np.mean(bleu_scores) if bleu_scores else 0.0
+    if not bleu_scores:
+        return 0.0
+    
+    result = float(np.mean(bleu_scores))
+    return result if np.isfinite(result) else 0.0
 
 
 def calculate_distinct_n(responses, n=2):
     """Calculate Distinct-n metric (higher = more diverse)"""
+    # Filter out empty or invalid responses
+    valid_responses = [r for r in responses if r and isinstance(r, str) and r.strip()]
+    if not valid_responses:
+        return 0.0
+    
     all_ngrams = []
     
-    for response in responses:
-        tokens = response.lower().split()
-        response_ngrams = list(ngrams(tokens, n))
-        all_ngrams.extend(response_ngrams)
+    for response in valid_responses:
+        try:
+            tokens = response.lower().split()
+            if len(tokens) < n:  # Need at least n tokens for n-grams
+                continue
+            response_ngrams = list(ngrams(tokens, n))
+            all_ngrams.extend(response_ngrams)
+        except:
+            continue
     
     if len(all_ngrams) == 0:
         return 0.0
@@ -106,22 +167,40 @@ def calculate_distinct_n(responses, n=2):
     unique_ngrams = len(set(all_ngrams))
     total_ngrams = len(all_ngrams)
     
-    return unique_ngrams / total_ngrams
+    if total_ngrams == 0:
+        return 0.0
+    
+    result = float(unique_ngrams / total_ngrams)
+    return result if np.isfinite(result) else 0.0
 
 
 def calculate_semantic_diversity(responses, model):
     """Calculate semantic diversity using embeddings (higher = more diverse)"""
-    if len(responses) < 2:
+    # Filter out empty or invalid responses
+    valid_responses = [r for r in responses if r and isinstance(r, str) and r.strip()]
+    if len(valid_responses) < 2:
         return 0.0
     
-    embeddings = model.encode(responses, convert_to_numpy=True)
-    distances = cosine_distances(embeddings)
-    
-    n = len(responses)
-    upper_triangle_indices = np.triu_indices(n, k=1)
-    pairwise_distances = distances[upper_triangle_indices]
-    
-    return np.mean(pairwise_distances)
+    try:
+        embeddings = model.encode(valid_responses, convert_to_numpy=True)
+        
+        # Check for NaN or Inf in embeddings
+        if not np.all(np.isfinite(embeddings)):
+            return 0.0
+        
+        distances = cosine_distances(embeddings)
+        
+        n = len(valid_responses)
+        upper_triangle_indices = np.triu_indices(n, k=1)
+        pairwise_distances = distances[upper_triangle_indices]
+        
+        if len(pairwise_distances) == 0:
+            return 0.0
+        
+        result = float(np.mean(pairwise_distances))
+        return result if np.isfinite(result) else 0.0
+    except Exception:
+        return 0.0
 
 # ============================================================
 # INFERENCE LOGIC
@@ -311,8 +390,11 @@ async def run_inference(config: InferenceConfig):
     os.makedirs(config.output_dir, exist_ok=True)
     output_file = os.path.join(config.output_dir, f"{experiment_folder}.json")
     
+    # Sanitize data for JSON serialization
+    sanitized_data = sanitize_for_json(output_data)
+    
     with open(output_file, 'w') as f:
-        json.dump(output_data, f, indent=2)
+        json.dump(sanitized_data, f, indent=2)
     
     # Print summary
     print("\n" + "="*70)
