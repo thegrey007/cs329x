@@ -148,6 +148,7 @@ class DiversityWeightedParquetComparisonBuilder(ComparisonDatasetBuilder):
 # SECTION 3: CUSTOM DATASET WRAPPER (Inject Metadata into Datums)
 # ============================================================================
 
+@chz.chz
 class DiversityWeightedDPODatasetBuilder(DPODatasetBuilderFromComparisons):
     """Extends DPO dataset builder to inject diversity metadata into Datum objects."""
 
