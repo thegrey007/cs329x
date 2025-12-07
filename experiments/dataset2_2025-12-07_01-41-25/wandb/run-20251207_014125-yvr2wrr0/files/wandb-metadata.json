@@ -1,0 +1,44 @@
+{
+  "os": "macOS-26.1-arm64-arm-64bit",
+  "python": "CPython 3.11.14",
+  "startedAt": "2025-12-07T09:41:25.566016Z",
+  "args": [
+    "model_name=Qwen/Qwen3-8B",
+    "dataset=2",
+    "num_epochs=2",
+    "lr_schedule=constant",
+    "wandb_project=cs329x-dpo"
+  ],
+  "program": "/Users/shrey/CodeFiles/CS329X/cs329x/scripts/train_dpo.py",
+  "codePath": "scripts/train_dpo.py",
+  "codePathLocal": "scripts/train_dpo.py",
+  "git": {
+    "remote": "https://github.com/thegrey007/cs329x.git",
+    "commit": "aa7f1c4de6f458d0ce58c325847b7fc2b6efeae8"
+  },
+  "email": "sramanuj@stanford.edu",
+  "root": "experiments/dataset2_2025-12-07_01-41-25",
+  "host": "DN2t05ph.SUNet",
+  "executable": "/opt/homebrew/Caskroom/miniconda/base/envs/cs329xfinalenv/bin/python",
+  "cpu_count": 10,
+  "cpu_count_logical": 10,
+  "disk": {
+    "/": {
+      "total": "994662584320",
+      "used": "193113079808"
+    }
+  },
+  "memory": {
+    "total": "25769803776"
+  },
+  "apple": {
+    "name": "Apple M4",
+    "ecpuCores": 6,
+    "pcpuCores": 4,
+    "gpuCores": 10,
+    "memoryGb": 24,
+    "swapTotalBytes": "3221225472",
+    "ramTotalBytes": "25769803776"
+  },
+  "writerId": "h7wrdxuxt1g6pultgcpjntfoxbznkyys"
+}
