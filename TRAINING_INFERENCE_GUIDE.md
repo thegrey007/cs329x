@@ -128,7 +128,7 @@ python3 scripts/inference_diversity_weighted_dpo.py \
 
 | Parameter | Default | Description |
 |-----------|---------|-------------|
-| `--model_path` | (required) | Trained model path (tinker:// or experiments/) |
+| `--model_path` | (required) | Trained model path (tinker:/) |
 | `--factual_adapter_path` | (required) | Factual adapter path (2-adapter only) |
 | `--creative_adapter_path` | (required) | Creative adapter path (2-adapter only) |
 | `--test_dataset` | `scripts/test_ultrafeedback.parquet` | Test dataset path |

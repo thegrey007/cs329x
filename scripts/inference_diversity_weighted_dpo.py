@@ -16,7 +16,6 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 import chz
-from dataclasses import dataclass
 from tqdm import tqdm
 
 import tinker
@@ -47,36 +46,16 @@ load_dotenv()
 # CLI CONFIGURATION
 # ============================================================
 
-@dataclass
+@chz.chz
 class InferenceConfig:
     """Configuration for diversity-weighted DPO inference"""
-    model_path: str = chz.field(
-        description="Path to trained model (tinker:// or experiments/...)"
-    )
-    test_dataset: str = chz.field(
-        default="scripts/test_ultrafeedback.parquet",
-        description="Path to test dataset parquet file"
-    )
-    k_samples: int = chz.field(
-        default=5,
-        description="Number of responses to generate per prompt"
-    )
-    output_dir: str = chz.field(
-        default="inference_results/diversity_weighted_dpo",
-        description="Directory to save inference results"
-    )
-    max_concurrent: int = chz.field(
-        default=10,
-        description="Maximum concurrent prompts to process"
-    )
-    max_tokens: int = chz.field(
-        default=512,
-        description="Maximum tokens per response"
-    )
-    temperature: float = chz.field(
-        default=1.0,
-        description="Sampling temperature"
-    )
+    model_path: str  # Required: Path to trained model (tinker:// or experiments/...)
+    test_dataset: str = "scripts/test_ultrafeedback.parquet"
+    k_samples: int = 5
+    output_dir: str = "inference_results/diversity_weighted_dpo"
+    max_concurrent: int = 10
+    max_tokens: int = 512
+    temperature: float = 1.0
 
 # ============================================================
 # METRIC FUNCTIONS
@@ -210,9 +189,8 @@ async def run_inference_batch(prompts_data, k, max_concurrent, sampling_client, 
 # MAIN FUNCTION
 # ============================================================
 
-async def main():
+async def run_inference(config: InferenceConfig):
     """Main inference function"""
-    config = chz.CLI(InferenceConfig)
     
     print("="*70)
     print("🚀 DIVERSITY-WEIGHTED DPO INFERENCE")
@@ -349,6 +327,10 @@ async def main():
     print(f"💾 Saved: {output_file}")
     print("="*70 + "\n")
 
+def main(config: InferenceConfig):
+    """Synchronous wrapper for async inference"""
+    asyncio.run(run_inference(config))
+
 if __name__ == "__main__":
-    asyncio.run(main())
+    chz.nested_entrypoint(main)
 
