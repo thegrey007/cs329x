@@ -9,6 +9,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 import asyncio
+import random
 import json
 import time
 from datetime import datetime
@@ -272,6 +273,10 @@ async def run_inference_batch(prompts_data, k, max_concurrent, sampling_client, 
 
 async def run_inference(config: InferenceConfig):
     """Main inference function"""
+    
+    # Set random seeds for reproducibility
+    random.seed(42)
+    np.random.seed(42)
     
     print("="*70)
     print("🚀 DIVERSITY-WEIGHTED DPO INFERENCE")

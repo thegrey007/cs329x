@@ -10,6 +10,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
 import asyncio
+import random
 import json
 import time
 from datetime import datetime
@@ -283,6 +284,10 @@ async def run_inference_batch(prompts_data, k, max_concurrent, factual_client, c
 async def run_inference(config: InferenceConfig):
     """Main inference function"""
     
+    # Set random seeds for reproducibility
+    random.seed(42)
+    np.random.seed(42)
+    
     print("="*70)
     print("🚀 2-ADAPTER DPO INFERENCE")
     print("="*70)
@@ -292,7 +297,7 @@ async def run_inference(config: InferenceConfig):
     print(f"K samples: {config.k_samples}")
     print(f"Output: {config.output_dir}")
     print("="*70 + "\n")
-    
+
     # Load test dataset
     print(f"📂 Loading test dataset...")
     test_df = pd.read_parquet(config.test_dataset)
