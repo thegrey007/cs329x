@@ -89,6 +89,7 @@ class InferenceConfig:
     max_concurrent: int = 10
     max_tokens: int = 512
     temperature: float = 1.0
+    sample_per_bin: int | None = None  # Number of prompts to sample per creativity bin (None = use all)
 
 # ============================================================
 # METRIC FUNCTIONS
@@ -210,7 +211,8 @@ def calculate_semantic_diversity(responses, model):
 
 async def generate_responses_for_prompt(prompt, k, sampling_client, renderer, sampling_params):
     """Generate k responses for a single prompt"""
-    messages = [{"role": "user", "content": prompt}]
+    # Add /no_think to disable chain-of-thought reasoning for Qwen models
+    messages = [{"role": "user", "content": f"{prompt} /no_think"}]
     model_input = renderer.build_generation_prompt(messages)
     
     # k parallel API calls
@@ -295,6 +297,36 @@ async def run_inference(config: InferenceConfig):
     print(f"📂 Loading test dataset...")
     test_df = pd.read_parquet(config.test_dataset)
     print(f"✅ Loaded {len(test_df)} test prompts\n")
+    
+    # Sample prompts from each creativity bin if requested
+    if config.sample_per_bin is not None:
+        print(f"🎲 Sampling {config.sample_per_bin} prompts per creativity bin...")
+        
+        # Define bins (4 bins of 0.25 width each)
+        test_df['creativity_bin'] = pd.cut(
+            test_df.get('creative_score', test_df.get('alpha', 0.0)),
+            bins=[0.0, 0.25, 0.5, 0.75, 1.0],
+            labels=['0.00-0.25', '0.25-0.50', '0.50-0.75', '0.75-1.00'],
+            include_lowest=True
+        )
+        
+        # Sample from each bin
+        sampled_dfs = []
+        for bin_label in ['0.00-0.25', '0.25-0.50', '0.50-0.75', '0.75-1.00']:
+            bin_df = test_df[test_df['creativity_bin'] == bin_label]
+            n_available = len(bin_df)
+            n_sample = min(config.sample_per_bin, n_available)
+            
+            if n_sample > 0:
+                sampled = bin_df.sample(n=n_sample, random_state=42)
+                sampled_dfs.append(sampled)
+                print(f"   Bin {bin_label}: sampled {n_sample}/{n_available} prompts")
+            else:
+                print(f"   Bin {bin_label}: no prompts available")
+        
+        test_df = pd.concat(sampled_dfs, ignore_index=True)
+        test_df = test_df.drop(columns=['creativity_bin'])
+        print(f"✅ Using {len(test_df)} sampled prompts for inference\n")
     
     # Initialize models
     print("🤖 Initializing models...")
