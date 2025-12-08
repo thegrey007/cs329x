@@ -306,10 +306,15 @@ async def run_inference(config: InferenceConfig):
     )
     
     tokenizer = get_tokenizer(base_model)
-    renderer = renderers.get_renderer(
-        get_recommended_renderer_name(base_model),
-        tokenizer
-    )
+    
+    # For Qwen models, use the disable_thinking renderer
+    renderer_name = get_recommended_renderer_name(base_model)
+    
+    # Override to disable thinking mode for Qwen3 models
+    if "qwen" in base_model.lower() and renderer_name == "qwen3":
+        renderer_name = "qwen3_disable_thinking"
+    
+    renderer = renderers.get_renderer(renderer_name, tokenizer)
     
     sampling_params = types.SamplingParams(
         max_tokens=config.max_tokens,
