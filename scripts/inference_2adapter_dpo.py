@@ -91,6 +91,7 @@ class InferenceConfig:
     max_tokens: int = 512
     temperature: float = 1.0
     sample_per_bin: int | None = None  # Number of prompts to sample per creativity bin (None = use all)
+    output_filename: str | None = None  # Custom output filename (without .json extension, None = auto-generate)
 
 # ============================================================
 # METRIC FUNCTIONS
@@ -111,21 +112,23 @@ def calculate_self_bleu(responses):
     
     for i, response in enumerate(valid_responses):
         try:
+            # Tokenize hypothesis
             hypothesis = word_tokenize(response.lower())
-            if not hypothesis:  # Skip empty tokenizations
+            if not hypothesis or len(hypothesis) == 0:
                 continue
                 
-            references = [
-                word_tokenize(valid_responses[j].lower()) 
-                for j in range(len(valid_responses)) 
-                if j != i
-            ]
+            # Tokenize references
+            references = []
+            for j in range(len(valid_responses)):
+                if j != i:
+                    ref_tokens = word_tokenize(valid_responses[j].lower())
+                    if ref_tokens and len(ref_tokens) > 0:
+                        references.append(ref_tokens)
             
-            # Filter out empty references
-            references = [ref for ref in references if ref]
-            if not references:
+            if not references or len(references) == 0:
                 continue
             
+            # Calculate BLEU with error handling
             bleu = sentence_bleu(
                 references, 
                 hypothesis, 
@@ -133,17 +136,20 @@ def calculate_self_bleu(responses):
                 weights=(0.25, 0.25, 0.25, 0.25)
             )
             
-            # Check for NaN or Inf
-            if np.isfinite(bleu):
-                bleu_scores.append(bleu)
-        except:
+            # Validate result
+            if bleu is not None and np.isfinite(bleu) and not np.isnan(bleu):
+                bleu_scores.append(float(bleu))
+                
+        except Exception as e:
+            # Log error but continue (responses might be too long, etc.)
             continue
     
-    if not bleu_scores:
-        return 0.0
+    # Return mean if we have scores, otherwise 0.0
+    if len(bleu_scores) > 0:
+        result = float(np.mean(bleu_scores))
+        return result if np.isfinite(result) and not np.isnan(result) else 0.0
     
-    result = float(np.mean(bleu_scores))
-    return result if np.isfinite(result) else 0.0
+    return 0.0
 
 
 def calculate_distinct_n(responses, n=2):
@@ -450,7 +456,14 @@ async def run_inference(config: InferenceConfig):
     
     # Save results
     os.makedirs(config.output_dir, exist_ok=True)
-    output_file = os.path.join(config.output_dir, f"{experiment_folder}.json")
+    
+    # Use custom filename if provided, otherwise auto-generate from experiment folder
+    if config.output_filename:
+        filename = config.output_filename if config.output_filename.endswith('.json') else f"{config.output_filename}.json"
+    else:
+        filename = f"{experiment_folder}.json"
+    
+    output_file = os.path.join(config.output_dir, filename)
     
     # Sanitize data for JSON serialization
     sanitized_data = sanitize_for_json(output_data)

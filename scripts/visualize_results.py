@@ -20,19 +20,19 @@ from typing import Dict, List, Tuple, Optional
 # Map of (dataset, approach) to inference result JSON file
 INFERENCE_RESULTS = {
     # Dataset 1
-    (1, "standard_dpo"): "inference_results/standard_dpo/final_dataset1.json",  # "inference_results/standard_dpo/dataset1_xxx.json",
-    (1, "2adapter_dpo"): "inference_results/2adapter_dpo_dataset1/sampler_weights.json",
-    (1, "diversity_weighted_dpo"): "inference_results/diversity_weighted_dpo/epoch1_batch19.json",
+    (1, "standard_dpo"): "inference_results_new_shreya/standard_dpo/final_dataset1.json",
+    (1, "2adapter_dpo"): "inference_results/2adapter_dpo/sampler_weights_actual_1.json",
+    (1, "diversity_weighted_dpo"): "inference_results_new_shreya/diversity_weighted_dpo/epoch1_batch39.json",
     
     # Dataset 2
-    (2, "standard_dpo"): "inference_results/standard_dpo/final_dataset2.json",
-    (2, "2adapter_dpo"): "inference_results/2adapter_dpo_dataset2/sampler_weights.json",
-    (2, "diversity_weighted_dpo"): "inference_results/diversity_weighted_dpo/dataset2_diversity.json",
+    (2, "standard_dpo"): "inference_results_new_shreya/standard_dpo/final_dataset2.json",
+    (2, "2adapter_dpo"): "inference_results/2adapter_dpo/sampler_weights_actual_2.json",
+    (2, "diversity_weighted_dpo"): "inference_results/diversity_weighted_dpo/dataset2_diversity_ssampled.json",
     
     # Dataset 3
-    (3, "standard_dpo"): "inference_results/standard_dpo/final_dataset3.json",
-    (3, "2adapter_dpo"): "inference_results/2adapter_dpo_dataset3/sampler_weights.json",
-    (3, "diversity_weighted_dpo"): "inference_results/diversity_weighted_dpo/dataset3_diversity.json",
+    (3, "standard_dpo"): "inference_results_new_shreya/standard_dpo/final_dataset3.json",
+    (3, "2adapter_dpo"): "inference_results/2adapter_dpo/sampler_weights_actual_3.json",
+    (3, "diversity_weighted_dpo"): "inference_results/diversity_weighted_dpo/dataset3_diversity_sampled.json",
 }
 
 # Visualization settings
@@ -169,7 +169,13 @@ def plot_line_comparison(all_data: Dict, output_dir: str):
     for dataset in datasets:
         # Create figure with 3 subplots (one per metric)
         fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-        fig.suptitle(f'Diversity Metrics Across Creativity Levels - Dataset {dataset}', 
+        if dataset == 1:
+            name = "Embedding Diversity"
+        elif dataset == 2:
+            name = "Standard DPO"
+        elif dataset == 3:
+            name = "LLM Judge Diversity"
+        fig.suptitle(f'Diversity Metrics Across Creativity Levels - Dataset {name}', 
                      fontsize=16, fontweight='bold')
         
         for metric_idx, metric in enumerate(metrics):
