@@ -20,19 +20,19 @@ from typing import Dict, List, Tuple, Optional
 # Map of (dataset, approach) to inference result JSON file
 INFERENCE_RESULTS = {
     # Dataset 1
-    (1, "standard_dpo"): "inference_results_new_shreya/standard_dpo/final_dataset1.json",
-    (1, "2adapter_dpo"): "inference_results/2adapter_dpo/sampler_weights_actual_1.json",
-    (1, "diversity_weighted_dpo"): "inference_results_new_shreya/diversity_weighted_dpo/epoch1_batch39.json",
+    # (1, "standard_dpo"): "inference_results_new_shreya/standard_dpo/final_dataset1.json",
+    # (1, "2adapter_dpo"): "inference_results/2adapter_dpo/sampler_weights_actual_1.json",
+    # (1, "diversity_weighted_dpo"): "inference_results_new_shreya/diversity_weighted_dpo/epoch1_batch39.json",
     
     # Dataset 2
-    (2, "standard_dpo"): "inference_results_new_shreya/standard_dpo/final_dataset2.json",
-    (2, "2adapter_dpo"): "inference_results/2adapter_dpo/sampler_weights_actual_2.json",
-    (2, "diversity_weighted_dpo"): "inference_results/diversity_weighted_dpo/dataset2_diversity_ssampled.json",
+    # (2, "standard_dpo"): "inference_results_new_shreya/standard_dpo/final_dataset2.json",
+    # (2, "2adapter_dpo"): "inference_results/2adapter_dpo/sampler_weights_actual_2.json",
+    (2, "diversity_weighted_dpo"): "inference_results/diversity_weighted_dpo/dataset2_diversity_full_uf.json",
     
     # Dataset 3
-    (3, "standard_dpo"): "inference_results_new_shreya/standard_dpo/final_dataset3.json",
-    (3, "2adapter_dpo"): "inference_results/2adapter_dpo/sampler_weights_actual_3.json",
-    (3, "diversity_weighted_dpo"): "inference_results/diversity_weighted_dpo/dataset3_diversity_sampled.json",
+    # (3, "standard_dpo"): "inference_results_new_shreya/standard_dpo/final_dataset3.json",
+    # (3, "2adapter_dpo"): "inference_results/2adapter_dpo/sampler_weights_actual_3.json",
+    (3, "diversity_weighted_dpo"): "inference_results/diversity_weighted_dpo/dataset3_diversity_full_uf.json",
 }
 
 # Visualization settings
