@@ -98,7 +98,10 @@ class InferenceConfig:
 # ============================================================
 
 def calculate_self_bleu(responses):
-    """Calculate Self-BLEU score (lower = more diverse)"""
+    """
+    Calculate Self-BLEU score (lower = more diverse)
+    Uses robust tokenization and smoothing to handle edge cases
+    """
     if len(responses) < 2:
         return 0.0
     
@@ -107,33 +110,49 @@ def calculate_self_bleu(responses):
     if len(valid_responses) < 2:
         return 0.0
     
-    smoothing = SmoothingFunction().method1
+    # Use method4 (smoothing that works better for short/diverse texts)
+    smoothing = SmoothingFunction().method4
     bleu_scores = []
+    
+    def simple_tokenize(text):
+        """Simple tokenization that handles markdown and special chars"""
+        import re
+        # Remove markdown formatting
+        text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)  # Remove **bold**
+        text = re.sub(r'\*([^*]+)\*', r'\1', text)      # Remove *italic*
+        text = re.sub(r'#{1,6}\s*', '', text)           # Remove ### headers
+        text = re.sub(r'[`~]', '', text)                 # Remove code markers
+        text = re.sub(r'\[([^\]]+)\]\([^)]+\)', r'\1', text)  # Remove links
+        # Simple word tokenization
+        tokens = re.findall(r'\b\w+\b', text.lower())
+        return tokens
     
     for i, response in enumerate(valid_responses):
         try:
-            # Tokenize hypothesis
-            hypothesis = word_tokenize(response.lower())
-            if not hypothesis or len(hypothesis) == 0:
+            # Tokenize hypothesis using simple tokenizer
+            hypothesis = simple_tokenize(response)
+            if not hypothesis or len(hypothesis) < 2:
                 continue
                 
             # Tokenize references
             references = []
             for j in range(len(valid_responses)):
                 if j != i:
-                    ref_tokens = word_tokenize(valid_responses[j].lower())
-                    if ref_tokens and len(ref_tokens) > 0:
+                    ref_tokens = simple_tokenize(valid_responses[j])
+                    if ref_tokens and len(ref_tokens) >= 2:
                         references.append(ref_tokens)
             
-            if not references or len(references) == 0:
+            if not references:
                 continue
             
-            # Calculate BLEU with error handling
+            # Calculate BLEU-4 with smoothing
+            # Use auto_reweigh=True to handle cases with fewer than 4 tokens
             bleu = sentence_bleu(
                 references, 
                 hypothesis, 
                 smoothing_function=smoothing,
-                weights=(0.25, 0.25, 0.25, 0.25)
+                weights=(0.25, 0.25, 0.25, 0.25),
+                auto_reweigh=True
             )
             
             # Validate result
@@ -141,13 +160,35 @@ def calculate_self_bleu(responses):
                 bleu_scores.append(float(bleu))
                 
         except Exception as e:
-            # Log error but continue (responses might be too long, etc.)
+            # Log error for debugging but continue
+            print(f"Self-BLEU calculation warning: {e}")
             continue
     
-    # Return mean if we have scores, otherwise 0.0
+    # Return mean if we have scores, otherwise calculate using simpler approach
     if len(bleu_scores) > 0:
         result = float(np.mean(bleu_scores))
         return result if np.isfinite(result) and not np.isnan(result) else 0.0
+    
+    # Fallback: If BLEU-4 fails, try BLEU-2 (bigram only)
+    try:
+        smoothing = SmoothingFunction().method4
+        for i, response in enumerate(valid_responses):
+            hypothesis = simple_tokenize(response)
+            if len(hypothesis) < 2:
+                continue
+            references = [simple_tokenize(valid_responses[j]) for j in range(len(valid_responses)) if j != i]
+            references = [r for r in references if len(r) >= 2]
+            if not references:
+                continue
+            # BLEU-2 (bigram only)
+            bleu = sentence_bleu(references, hypothesis, smoothing_function=smoothing, weights=(0.5, 0.5, 0, 0))
+            if bleu is not None and np.isfinite(bleu):
+                bleu_scores.append(float(bleu))
+        
+        if bleu_scores:
+            return float(np.mean(bleu_scores))
+    except Exception:
+        pass
     
     return 0.0
 
