@@ -1,0 +1,37 @@
+{
+  "log_path": "experiments/dataset2_2025-12-07_01-41-25",
+  "model_name": "Qwen/Qwen3-8B",
+  "dataset_builder": {
+    "common_config": {
+      "model_name_for_tokenizer": "Qwen/Qwen3-8B",
+      "renderer_name": "qwen3",
+      "max_length": 8192,
+      "batch_size": 256,
+      "train_on_what": null
+    },
+    "comparison_builder": {
+      "swap": false,
+      "dataset_number": 2,
+      "test_size": 1024
+    }
+  },
+  "load_checkpoint_path": null,
+  "learning_rate": 1e-05,
+  "lr_schedule": "constant",
+  "num_epochs": 2,
+  "dpo_beta": 0.1,
+  "lora_rank": 32,
+  "num_replicas": 8,
+  "base_url": null,
+  "evaluator_builders": [],
+  "infrequent_evaluator_builders": [],
+  "save_every": 20,
+  "eval_every": 10,
+  "infrequent_eval_every": 100,
+  "adam_beta1": 0.9,
+  "adam_beta2": 0.95,
+  "adam_eps": 1e-08,
+  "wandb_project": "cs329x-dpo",
+  "wandb_name": "dataset2_2025-12-07_01-41-25",
+  "reference_model_name": null
+}

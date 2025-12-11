@@ -1,0 +1,119 @@
+_wandb:
+    value:
+        cli_version: 0.23.1
+        e:
+            nio79vbocpv873lju1rglq7xtpcra472:
+                apple:
+                    ecpuCores: 6
+                    gpuCores: 10
+                    memoryGb: 24
+                    name: Apple M4
+                    pcpuCores: 4
+                    ramTotalBytes: "25769803776"
+                    swapTotalBytes: "6442450944"
+                args:
+                    - model_name=Qwen/Qwen3-8B
+                    - dataset=1
+                    - num_epochs=2
+                    - learning_rate=1e-5
+                    - batch_size=128
+                    - wandb_project=cs329x-dpo
+                codePath: scripts/train_dpo.py
+                codePathLocal: scripts/train_dpo.py
+                cpu_count: 10
+                cpu_count_logical: 10
+                disk:
+                    /:
+                        total: "994662584320"
+                        used: "197265522688"
+                email: sramanuj@stanford.edu
+                executable: /opt/homebrew/Caskroom/miniconda/base/envs/cs329xfinalenv/bin/python
+                git:
+                    commit: 21307838a7228635daa151489319adfb61577a44
+                    remote: https://github.com/thegrey007/cs329x.git
+                host: DN2t05ph.SUNet
+                memory:
+                    total: "25769803776"
+                os: macOS-26.1-arm64-arm-64bit
+                program: /Users/shrey/CodeFiles/CS329X/cs329x/scripts/train_dpo.py
+                python: CPython 3.11.14
+                root: experiments/dataset1_2025-12-07_10-04-16
+                startedAt: "2025-12-07T18:04:16.818555Z"
+                writerId: nio79vbocpv873lju1rglq7xtpcra472
+        m: []
+        python_version: 3.11.14
+        t:
+            "1":
+                - 1
+                - 49
+                - 51
+            "2":
+                - 1
+                - 5
+                - 11
+                - 49
+                - 51
+                - 53
+            "3":
+                - 2
+                - 13
+                - 16
+                - 61
+            "4": 3.11.14
+            "5": 0.23.1
+            "12": 0.23.1
+            "13": darwin-arm64
+adam_beta1:
+    value: 0.9
+adam_beta2:
+    value: 0.95
+adam_eps:
+    value: 1e-08
+base_url:
+    value: null
+dataset_builder:
+    value:
+        common_config:
+            batch_size: 128
+            max_length: 8192
+            model_name_for_tokenizer: Qwen/Qwen3-8B
+            renderer_name: qwen3
+            train_on_what: null
+        comparison_builder:
+            dataset_number: 1
+            swap: false
+            test_size: 1024
+dpo_beta:
+    value: 0.1
+eval_every:
+    value: 10
+evaluator_builders:
+    value: []
+infrequent_eval_every:
+    value: 100
+infrequent_evaluator_builders:
+    value: []
+learning_rate:
+    value: 1e-05
+load_checkpoint_path:
+    value: null
+log_path:
+    value: experiments/dataset1_2025-12-07_10-04-16
+lora_rank:
+    value: 32
+lr_schedule:
+    value: linear
+model_name:
+    value: Qwen/Qwen3-8B
+num_epochs:
+    value: 2
+num_replicas:
+    value: 8
+reference_model_name:
+    value: null
+save_every:
+    value: 20
+wandb_name:
+    value: dataset1_2025-12-07_10-04-16
+wandb_project:
+    value: cs329x-dpo

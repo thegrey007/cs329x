@@ -1,0 +1,47 @@
+{
+  "os": "macOS-15.1.1-arm64-arm-64bit-Mach-O",
+  "python": "CPython 3.13.0",
+  "startedAt": "2025-12-07T02:04:07.347921Z",
+  "args": [
+    "model_name=Qwen/Qwen3-8B",
+    "dataset=2",
+    "learning_rate=1e-5",
+    "num_epochs=1",
+    "batch_size=128",
+    "dpo_beta=0.1",
+    "lora_rank=32",
+    "wandb_project=cs329x-dpo"
+  ],
+  "program": "/Users/abhinavsattiraju/Desktop/329x/cs329x/scripts/train_2adapter_dpo.py",
+  "codePath": "scripts/train_2adapter_dpo.py",
+  "codePathLocal": "scripts/train_2adapter_dpo.py",
+  "git": {
+    "remote": "git@github.com-asattiraju1:thegrey007/cs329x.git",
+    "commit": "49ee341e5eb3ea9a45f2591db35669253f23d0c1"
+  },
+  "email": "asattira@stanford.edu",
+  "root": "experiments/2adapter_dataset2_2025-12-06_18-04-07/factual",
+  "host": "Abhinavs-MacBook-Pro.local",
+  "executable": "/Library/Frameworks/Python.framework/Versions/3.13/bin/python3",
+  "cpu_count": 12,
+  "cpu_count_logical": 12,
+  "disk": {
+    "/": {
+      "total": "494384795648",
+      "used": "376354451456"
+    }
+  },
+  "memory": {
+    "total": "25769803776"
+  },
+  "apple": {
+    "name": "Apple M4 Pro",
+    "ecpuCores": 4,
+    "pcpuCores": 8,
+    "gpuCores": 16,
+    "memoryGb": 24,
+    "swapTotalBytes": "11811160064",
+    "ramTotalBytes": "25769803776"
+  },
+  "writerId": "1815z95558qa4s5ew7xv9m18q3bfs0s9"
+}

@@ -1,0 +1,48 @@
+{
+  "os": "macOS-15.1.1-arm64-arm-64bit-Mach-O",
+  "python": "CPython 3.13.0",
+  "startedAt": "2025-12-07T17:39:21.092757Z",
+  "args": [
+    "model_name=Qwen/Qwen3-8B",
+    "dataset=3",
+    "gamma=0.05",
+    "learning_rate=1e-5",
+    "num_epochs=2",
+    "batch_size=128",
+    "dpo_beta=0.1",
+    "lora_rank=32",
+    "wandb_project=cs329x-dpo"
+  ],
+  "program": "/Users/abhinavsattiraju/Desktop/329x/cs329x/scripts/train_diversity_weighted_dpo.py",
+  "codePath": "scripts/train_diversity_weighted_dpo.py",
+  "codePathLocal": "scripts/train_diversity_weighted_dpo.py",
+  "git": {
+    "remote": "git@github.com-asattiraju1:thegrey007/cs329x.git",
+    "commit": "39b630183734cc8d40495817661c6dfadd59f93d"
+  },
+  "email": "asattira@stanford.edu",
+  "root": "experiments/divweight_dataset3_gamma0.05_2025-12-07_09-39-20",
+  "host": "Abhinavs-MacBook-Pro.local",
+  "executable": "/usr/local/bin/python3.13",
+  "cpu_count": 12,
+  "cpu_count_logical": 12,
+  "disk": {
+    "/": {
+      "total": "494384795648",
+      "used": "373990903808"
+    }
+  },
+  "memory": {
+    "total": "25769803776"
+  },
+  "apple": {
+    "name": "Apple M4 Pro",
+    "ecpuCores": 4,
+    "pcpuCores": 8,
+    "gpuCores": 16,
+    "memoryGb": 24,
+    "swapTotalBytes": "13958643712",
+    "ramTotalBytes": "25769803776"
+  },
+  "writerId": "dt9kttzrlzsfi195v851q8lywd5h13ob"
+}

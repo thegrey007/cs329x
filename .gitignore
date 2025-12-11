@@ -143,6 +143,9 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+data/final_lamini_informational_creative_dataset_uf
+scripts/filtered_rows.pkl
+scripts/failed_judgments.pkl
 
 # Spyder project settings
 .spyderproject
@@ -205,3 +208,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Large data files (embeddings cache, LLM judge outputs)
+scripts/embedding_cache.pkl
+scripts/llm_judge_rankings_10k.pkl
+scripts/llm_judge_failed_10k.pkl
+scripts/llm_judge_10k_input.pkl
+scripts/failed_judgments.pkl
